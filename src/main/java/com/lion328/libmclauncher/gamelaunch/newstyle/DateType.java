@@ -16,7 +16,7 @@ import com.google.gson.JsonSerializer;
 
 public class DateType implements JsonSerializer<Date>, JsonDeserializer<Date> {
 
-	private static DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+	private static DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 	
 	@Override
 	public JsonElement serialize(Date arg0, Type arg1, JsonSerializationContext arg2) {

@@ -1,4 +1,4 @@
-package com.lion328.libmclauncher.gamelaunch.oldstyle.applet;
+package com.lion328.libmclauncher.gamelaunch.old.applet;
 
 import java.applet.Applet;
 import java.applet.AppletStub;
@@ -7,7 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
-public class GameApplet extends Applet implements AppletStub, Runnable {
+public class GameAppletContainer extends Applet implements AppletStub, Runnable {
 
 	private static final long serialVersionUID = 50965766177777469L;
 	
@@ -15,11 +15,11 @@ public class GameApplet extends Applet implements AppletStub, Runnable {
 	private boolean active = false;
 	private HashMap<String, String> params = new HashMap<String, String>();
 	
-	public GameApplet(Applet mcapplet) {
+	public GameAppletContainer(Applet mcapplet) {
 		this(mcapplet, null);
 	}
 	
-	public GameApplet(Applet mcapplet, HashMap<String, String> customParams) {
+	public GameAppletContainer(Applet mcapplet, HashMap<String, String> customParams) {
 		this.applet = mcapplet;
 		if(customParams != null) params.putAll(customParams);
 	}

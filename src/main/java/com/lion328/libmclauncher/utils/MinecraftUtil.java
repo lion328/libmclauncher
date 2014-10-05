@@ -4,15 +4,22 @@ import java.io.File;
 
 public class MinecraftUtil {
 
-	public static final String[] MINECRAFT_JARS = new String[] {"lwjgl.jar", "lwjgl_util.jar", "jinput.jar", "minecraft.jar"};
+	public static final String[] OLD_MINECRAFT_JARS = new String[] {"lwjgl.jar", "lwjgl_util.jar", "jinput.jar", "minecraft.jar"};
 	
-	public static boolean isVaildMinecraftDirectory(File basepath) {
+	private static final String[] MINECRAFT_FOLDERS = new String[] {"libraries", "versions"};
+	
+	public static boolean isVaildOldMinecraftDirectory(File basepath) {
 		File bin = new File(basepath, "bin");
 		if(bin.isDirectory() && new File(bin, "natives").isDirectory()) {
-			for(String filename : MINECRAFT_JARS) if(!new File(bin, filename).isFile()) return false;
+			for(String filename : OLD_MINECRAFT_JARS) if(!new File(bin, filename).isFile()) return false;
 			return true;
 		}
 		return false;
+	}
+	
+	public static boolean isVaildMinecraftDirectory(File basepath) {
+		for(String folderName : MINECRAFT_FOLDERS) if(!new File(basepath, folderName).isDirectory()) return false;
+		return true;
 	}
 	
 	public static File getMinecraftWorkingDirectory() {

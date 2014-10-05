@@ -1,5 +1,6 @@
-package com.lion328.libmclauncher.gamelaunch.newstyle;
+package com.lion328.libmclauncher.gamelaunch.json;
 
+import java.util.Arrays;
 import java.util.Date;
 
 public class GameVersion {
@@ -58,4 +59,10 @@ public class GameVersion {
 		return minimumLauncherVersion;
 	}
 	
+	public String toString() {
+		return "GameVersion[id=\"" + id + "\", minecraftArguments=\"" + minecraftArguments + "\", mainClass=\"" + mainClass + 
+				"\", assets=" + assets.toString() + ", time=" + time.toString() + ", releaseTime=" + releaseTime.toString() +
+				", type=\"" + type.toString() + "\", libraries=" + Arrays.asList(libraries).toString() + ", minimumLauncherVersion=" + minimumLauncherVersion +
+				"]";
+	}
 }

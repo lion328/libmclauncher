@@ -10,9 +10,9 @@ public final class OSUtil {
 		if(currentOS == null) {
 			String osName = System.getProperty("os.name").toLowerCase();
 			if(osName.indexOf("win") > -1) currentOS = OS.WINDOWS;
-			else if(osName.indexOf("mac") > -1) currentOS = OS.MAC;
-			else if(osName.indexOf("nix") > -1 || osName.indexOf("nux") > -1 || osName.indexOf("aix") > 0) currentOS = OS.LINUX;
-			else if(osName.indexOf("sunos") > -1) currentOS = OS.SOLARIS;
+			else if(osName.contains("mac")) currentOS = OS.MAC;
+			else if(osName.contains("nix") || osName.contains("nux") || osName.contains("aix")) currentOS = OS.LINUX;
+			else if(osName.contains("sunos")) currentOS = OS.SOLARIS;
 			else currentOS = OS.UNKNOWN;
 		}
 		return currentOS;

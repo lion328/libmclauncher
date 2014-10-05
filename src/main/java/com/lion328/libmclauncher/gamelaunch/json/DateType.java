@@ -1,4 +1,4 @@
-package com.lion328.libmclauncher.gamelaunch.newstyle;
+package com.lion328.libmclauncher.gamelaunch.json;
 
 import java.lang.reflect.Type;
 import java.text.DateFormat;

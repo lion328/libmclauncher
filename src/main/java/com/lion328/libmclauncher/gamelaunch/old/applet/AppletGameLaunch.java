@@ -1,4 +1,4 @@
-package com.lion328.libmclauncher.gamelaunch.oldstyle.applet;
+package com.lion328.libmclauncher.gamelaunch.old.applet;
 
 import java.applet.Applet;
 import java.awt.BorderLayout;
@@ -16,21 +16,21 @@ import javax.swing.JFrame;
 import com.lion328.libmclauncher.gamelaunch.IGameLaunch;
 import com.lion328.libmclauncher.utils.MinecraftUtil;
 
-public final class AppletGameLaunch implements IGameLaunch {
+public class AppletGameLaunch implements IGameLaunch {
 
 	private File bin;
 	private HashMap<String, String> params = new HashMap<String, String>();
 	
 	public AppletGameLaunch(File basepath) throws Exception {
-		if(!MinecraftUtil.isVaildMinecraftDirectory(basepath)) throw new Exception("Invaild Minecraft's working directory.");
+		if(!MinecraftUtil.isVaildOldMinecraftDirectory(basepath)) throw new Exception("Invaild Minecraft's working directory.");
 		bin = new File(basepath, "bin");
 		setStandAlone(true);
 	}
 	
 	@Override
 	public void launch() throws Exception {
-		URL[] jars = new URL[MinecraftUtil.MINECRAFT_JARS.length];
-		for(int i = 0; i < jars.length; i++) jars[i] = new File(bin, MinecraftUtil.MINECRAFT_JARS[i]).toURI().toURL();
+		URL[] jars = new URL[MinecraftUtil.OLD_MINECRAFT_JARS.length];
+		for(int i = 0; i < jars.length; i++) jars[i] = new File(bin, MinecraftUtil.OLD_MINECRAFT_JARS[i]).toURI().toURL();
 		final URLClassLoader classLoader = new URLClassLoader(jars);
 		Applet applet = (Applet)classLoader.loadClass("net.minecraft.client.MinecraftApplet").newInstance();
 		
@@ -38,7 +38,7 @@ public final class AppletGameLaunch implements IGameLaunch {
 		System.setProperty("org.lwjgl.librarypath", nativesPath);
 	    System.setProperty("net.java.games.input.librarypath", nativesPath);
 	    
-	    final GameApplet gapp = new GameApplet(applet, params);
+	    final GameAppletContainer gapp = new GameAppletContainer(applet, params);
 	    gapp.setPreferredSize(new Dimension(854, 480));
 	    gapp.setBackground(Color.BLACK);
 	    
@@ -80,11 +80,13 @@ public final class AppletGameLaunch implements IGameLaunch {
 		params.put(key, value);
 	}
 	
+	@Override
 	public void setUsername(String username) {
 		params.put("username", username);
 		if(getParameter("sessionid") == null) setSessionID("123456");
 	}
 	
+	@Override
 	public void setSessionID(String sessionid) {
 		params.put("sessionid", sessionid);
 	}

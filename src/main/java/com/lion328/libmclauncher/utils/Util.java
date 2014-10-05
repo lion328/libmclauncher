@@ -33,4 +33,8 @@ public class Util {
 		if(java_path == null) java_path = (System.getProperty("java.home") + "/bin/java").replace("/", File.separator);
 		return java_path;
 	}
+	
+	public static String getSystemArchitecture() {
+		return System.getProperty("os.arch").contains("64") ? "64" : "32";
+	}
 }

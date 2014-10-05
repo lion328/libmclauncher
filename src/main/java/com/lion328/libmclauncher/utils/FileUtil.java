@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class FileUtil {
 
-	public static String readFile(File f) throws IOException{
+	public static String readFile(File f) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(f));
 		StringBuilder sb = new StringBuilder();
 		String str;

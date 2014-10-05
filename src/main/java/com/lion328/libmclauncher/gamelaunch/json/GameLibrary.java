@@ -1,4 +1,4 @@
-package com.lion328.libmclauncher.gamelaunch.newstyle;
+package com.lion328.libmclauncher.gamelaunch.json;
 
 import java.io.File;
 import java.util.Arrays;
@@ -8,13 +8,14 @@ import com.google.gson.annotations.SerializedName;
 import com.lion328.libmclauncher.utils.FileUtil;
 import com.lion328.libmclauncher.utils.MinecraftUtil;
 import com.lion328.libmclauncher.utils.OSUtil;
+import com.lion328.libmclauncher.utils.Util;
 import com.lion328.libmclauncher.utils.ZipUtil;
 
 public class GameLibrary {
 
 	private String name;
 	private Rule[] rules;
-	private ExtractRule extractRule;
+	private ExtractRule extract;
 	private Natives natives;
 	
 	private transient String[] nameData;
@@ -22,7 +23,7 @@ public class GameLibrary {
 	public GameLibrary(String name, Rule[] rules, ExtractRule extractrule, Natives natives) {
 		this.name = name;
 		this.rules = rules;
-		extractRule = extractrule;
+		extract = extractrule;
 		
 		splitName();
 	}
@@ -55,6 +56,7 @@ public class GameLibrary {
 	
 	public File getFile(File basepath) {
 		if(!MinecraftUtil.isVaildMinecraftDirectory(basepath)) return null;
+		splitName();
 		File library = new File(basepath, "libraries" + File.separator + nameData[0].replace('.', File.separatorChar) + File.separator + nameData[1] + File.separator + nameData[2] + File.separator + nameData[1] + "-" + nameData[2] + (isNative() ? ("-" + natives.getCurrentOSNative() + ".jar") : ".jar"));
 		if(!library.isFile()) return null;
 		return library;
@@ -65,19 +67,23 @@ public class GameLibrary {
 		boolean all = true;
 		for(Rule rule : rules) {
 			all &= rule.isAllowed();
-			if(!all) break;
+			if(!all) return false;
 		}
-		return all;
+		return true;
 	}
 	
 	public boolean extractNatives(File basepath, File extractPath) {
 		if(!isNative()) return false;
-		if(!extractPath.isDirectory() && extractPath.isFile()) return false;
-		if(!extractPath.isDirectory()) extractPath.mkdir();
+		if(extractPath.isFile()) return false;
 		if(!MinecraftUtil.isVaildMinecraftDirectory(basepath)) return false;
 		ZipUtil.extract(getFile(basepath), extractPath);
-		for(String exclude : extractRule.getExclude()) FileUtil.delete(new File(extractPath, exclude));
+		if(extract != null) for(String exclude : extract.getExclude()) FileUtil.delete(new File(extractPath, exclude));
 		return true;
+	}
+	
+	public String toString() {
+		return "GameLibrary[name=\"" + name + "\", rules=" + (rules == null ? "null" : Arrays.asList(rules).toString()) + ", extractRule=" + (extract == null ? "null" : extract) +
+				", natives=" + (isNative() ? "null" : natives) + "]";
 	}
 }
 
@@ -92,15 +98,15 @@ class Natives {
 	}
 
 	public String getLinuxNative() {
-		return linux.replace("${arch}", System.getProperty("os.arch"));
+		return linux.replace("${arch}", Util.getSystemArchitecture());
 	}
 
 	public String getWindowsNative() {
-		return windows.replace("${arch}", System.getProperty("os.arch"));
+		return windows.replace("${arch}", Util.getSystemArchitecture());
 	}
 
 	public String getOSXNative() {
-		return osx.replace("${arch}", System.getProperty("os.arch"));
+		return osx.replace("${arch}", Util.getSystemArchitecture());
 	}
 	
 	public String getCurrentOSNative() {
@@ -108,19 +114,32 @@ class Natives {
 		default:
 		case UNKNOWN:
 		case SOLARIS:
-		case LINUX: return linux;
-		case WINDOWS: return windows;
-		case MAC: return osx;
+		case LINUX: return getLinuxNative();
+		case WINDOWS: return getWindowsNative();
+		case MAC: return getOSXNative();
 		}
 	}
 	
+	public String toString() {
+		return "Natives[linux=\"" + linux + "\", windows=\"" + windows + "\", osx=\"" + osx + "\"]";
+	}
 }
 
 enum Action { 
 	@SerializedName("allow")
-	ALLOW, 
+	ALLOW("allow"), 
 	@SerializedName("disallow")
-	DISALLOW
+	DISALLOW("disallow");
+	
+	private transient String s;
+	
+	Action(String s) {
+		this.s = s;
+	}
+	
+	public String toString() {
+		return s;
+	}
 }
 
 class RuleOS {
@@ -136,6 +155,10 @@ class RuleOS {
 		if(os == null) os = OSUtil.getOSFromString(name);
 		return os;
 	}
+	
+	public String toString() {
+		return "RuleOS[name=\"" + name + "\"]";
+	}
 }
 
 class Rule {
@@ -149,8 +172,12 @@ class Rule {
 	}
 	
 	public boolean isAllowed() {
-		boolean b = os == null ? true : OSUtil.getCurrentOS().equals(os);
+		boolean b = os == null ? true : OSUtil.getCurrentOS().equals(os.getOS());
 		return action.equals(Action.ALLOW) ? b : !b;
+	}
+	
+	public String toString() {
+		return "Rule[action=\"" + action.toString() + "\", os=" + (os == null ? "null" : os.toString()) + "]";
 	}
 }
 
@@ -168,5 +195,9 @@ class ExtractRule {
 	
 	public String[] getExclude() {
 		return exclude.toArray(new String[exclude.size()]);
+	}
+	
+	public String toString() {
+		return "ExtractRule[exclude=" + exclude.toString() + "]";
 	}
 }

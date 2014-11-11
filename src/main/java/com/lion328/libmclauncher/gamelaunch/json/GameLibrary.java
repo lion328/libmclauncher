@@ -86,8 +86,7 @@ public class GameLibrary {
 	
 	public boolean isAllowed() {
 		if(rules == null) return true;
-		boolean all = true;
-		for(Rule rule : rules) if(!(all &= rule.isAllowed())) return false;
+		for(Rule rule : rules) if(!rule.isAllowed()) return false;
 		return true;
 	}
 	

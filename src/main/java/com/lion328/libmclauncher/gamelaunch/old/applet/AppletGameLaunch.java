@@ -59,40 +59,40 @@ public class AppletGameLaunch implements IGameLaunch {
 		
 		String nativesPath = new File(bin, "natives").getAbsolutePath();
 		System.setProperty("org.lwjgl.librarypath", nativesPath);
-	    System.setProperty("net.java.games.input.librarypath", nativesPath);
-	    
-	    final GameAppletContainer gapp = new GameAppletContainer(applet, params);
-	    gapp.setPreferredSize(new Dimension(854, 480));
-	    gapp.setBackground(Color.BLACK);
-	    
-	    JFrame frame = new JFrame();
-	    frame.setSize(854, 480);
-	    frame.setIconImage(ImageIO.read(this.getClass().getResourceAsStream("/com/lion328/libmclauncher/resources/minecraft_icon.png")));
-	    frame.setTitle("Minecraft");
-	    frame.setLayout(new BorderLayout());
-	    frame.add(gapp, "Center");
-	    frame.pack();
-	    frame.setLocationRelativeTo(null);
-	    frame.setVisible(true);
-	    
-	    gapp.launch();
-	    
-	    new Thread() {
-	    	public void run() {
-	    		while(gapp.isActive()) {
-	    			try {
+		System.setProperty("net.java.games.input.librarypath", nativesPath);
+		
+		final GameAppletContainer gapp = new GameAppletContainer(applet, params);
+		gapp.setPreferredSize(new Dimension(854, 480));
+		gapp.setBackground(Color.BLACK);
+		
+		JFrame frame = new JFrame();
+		frame.setSize(854, 480);
+		frame.setIconImage(ImageIO.read(this.getClass().getResourceAsStream("/com/lion328/libmclauncher/resources/minecraft_icon.png")));
+		frame.setTitle("Minecraft");
+		frame.setLayout(new BorderLayout());
+		frame.add(gapp, "Center");
+		frame.pack();
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+		
+		gapp.launch();
+		
+		new Thread() {
+			public void run() {
+				while(gapp.isActive()) {
+					try {
 						Thread.sleep(1000L);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-	    		}
-	    		try {
+				}
+				try {
 					classLoader.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-	    	}
-	    }.start();
+			}
+		}.start();
 	}
 
 	public String getParameter(String key) {

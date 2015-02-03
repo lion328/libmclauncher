@@ -42,10 +42,14 @@ public class GameLibrary {
 	
 	private transient String[] nameData;
 	
-	public GameLibrary(String name, Rule[] rules, ExtractRule extractrule, Natives natives) {
+	public GameLibrary(String packageName, String name, String version, Rule[] rules, ExtractRule extractRule, Natives natives) {
+		this(packageName + ":" + name + ":" + version, rules, extractRule, natives);
+	}
+	
+	public GameLibrary(String name, Rule[] rules, ExtractRule extractRule, Natives natives) {
 		this.name = name;
 		this.rules = rules;
-		extract = extractrule;
+		extract = extractRule;
 		
 		splitName();
 	}

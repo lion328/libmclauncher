@@ -49,19 +49,19 @@ public class FileUtil {
 		return Files.readAllBytes(f.toPath());
 	}
 	
-	public static File[] listAllFiles(File dir){
+	public static File[] listAllFiles(File dir, boolean withDirectory){
 		if(!dir.exists()) return null;
 		Set<File> fs = new HashSet<File>(Arrays.asList(dir.listFiles()));
 		for(File f : fs.toArray(new File[fs.size()])){
-			if(f.isDirectory()) fs.addAll(Arrays.asList(listAllFiles(f)));
-			fs.add(f);
+			if(f.isDirectory()) fs.addAll(Arrays.asList(listAllFiles(f, withDirectory)));
+			if(withDirectory) fs.add(f);
 		}
 		return fs.toArray(new File[fs.size()]);
 	}
 	
 	public static void delete(File f) {
 		if(f.exists()) {
-			if(f.isDirectory()) for(File f2 : listAllFiles(f)) delete(f2);
+			if(f.isDirectory()) for(File f2 : listAllFiles(f, true)) delete(f2);
 			f.delete();
 		}
 	}

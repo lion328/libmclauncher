@@ -61,7 +61,16 @@ public class AppletGameLaunch implements IGameLaunch {
 		System.setProperty("org.lwjgl.librarypath", nativesPath);
 		System.setProperty("net.java.games.input.librarypath", nativesPath);
 		
-		final GameAppletContainer gapp = new GameAppletContainer(applet, params);
+		final GameAppletContainer gapp = new GameAppletContainer(applet, params, new Runnable() {
+			public void run() {
+				try {
+					classLoader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
 		gapp.setPreferredSize(new Dimension(854, 480));
 		gapp.setBackground(Color.BLACK);
 		
@@ -76,23 +85,6 @@ public class AppletGameLaunch implements IGameLaunch {
 		frame.setVisible(true);
 		
 		gapp.launch();
-		
-		new Thread() {
-			public void run() {
-				while(gapp.isActive()) {
-					try {
-						Thread.sleep(1000L);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				try {
-					classLoader.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();
 	}
 
 	public String getParameter(String key) {
@@ -106,7 +98,7 @@ public class AppletGameLaunch implements IGameLaunch {
 	@Override
 	public void setUsername(String username) {
 		params.put("username", username);
-		if(getParameter("sessionid") == null) setSessionID("123456");
+		if(getParameter("sessionid") == null) setSessionID("123456"); // if not set session id, username will not work.
 	}
 	
 	@Override

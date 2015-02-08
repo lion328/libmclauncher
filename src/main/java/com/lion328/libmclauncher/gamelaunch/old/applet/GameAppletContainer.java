@@ -36,14 +36,16 @@ public class GameAppletContainer extends Applet implements AppletStub, Runnable 
 	private Applet applet = null;
 	private boolean active = false;
 	private HashMap<String, String> params = new HashMap<String, String>();
+	private Runnable destroyEvent;
 	
 	public GameAppletContainer(Applet mcapplet) {
-		this(mcapplet, null);
+		this(mcapplet, null, null);
 	}
 	
-	public GameAppletContainer(Applet mcapplet, HashMap<String, String> customParams) {
+	public GameAppletContainer(Applet mcapplet, HashMap<String, String> customParams, Runnable destroyEvent) {
 		this.applet = mcapplet;
 		if(customParams != null) params.putAll(customParams);
+		this.destroyEvent = destroyEvent;
 	}
 	
 	@Override
@@ -86,6 +88,7 @@ public class GameAppletContainer extends Applet implements AppletStub, Runnable 
 	@Override
 	public void destroy() {
 		applet.destroy();
+		destroyEvent.run();
 	}
 	
 	@Override

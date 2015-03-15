@@ -99,7 +99,7 @@ public class GameLibrary {
 		if(extractPath.isFile()) return false;
 		if(!MinecraftUtil.isVaildMinecraftDirectory(basepath)) return false;
 		ZipUtil.extract(getFile(basepath), extractPath);
-		if(extract != null) for(String exclude : extract.getExclude()) FileUtil.delete(new File(extractPath, exclude));
+		if(extract != null) for(String exclude : extract.getExclude()) FileUtil.deleteFiles(new File(extractPath, exclude));
 		return true;
 	}
 	

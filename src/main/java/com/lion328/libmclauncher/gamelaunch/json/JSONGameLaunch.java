@@ -101,7 +101,7 @@ public class JSONGameLaunch implements IGameLaunch {
 		versionDir.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
-				if(pathname.isDirectory() && pathname.getName().matches(version.replace(".", "\\.") + "-natives-\\d+")) FileUtil.delete(pathname);
+				if(pathname.isDirectory() && pathname.getName().matches(version.replace(".", "\\.") + "-natives-\\d+")) FileUtil.deleteFiles(pathname);
 				return false;
 			}
 		});

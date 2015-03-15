@@ -59,9 +59,9 @@ public class FileUtil {
 		return fs.toArray(new File[fs.size()]);
 	}
 	
-	public static void delete(File f) {
+	public static void deleteFiles(File f) {
 		if(f.exists()) {
-			if(f.isDirectory()) for(File f2 : listAllFiles(f, true)) delete(f2);
+			if(f.isDirectory()) for(File f2 : listAllFiles(f, true)) deleteFiles(f2);
 			f.delete();
 		}
 	}

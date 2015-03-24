@@ -23,6 +23,8 @@
 package com.lion328.libmclauncher.gamelaunch.json;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,7 +37,10 @@ import com.lion328.libmclauncher.utils.ZipUtil;
 
 public class GameLibrary {
 
+	public static final URL MINECRAFT_LIBRARIES_DOWNLOAD_BASEURL;
+	
 	private String name;
+	private URL url;
 	private Rule[] rules;
 	private ExtractRule extract;
 	private Natives natives;
@@ -44,10 +49,16 @@ public class GameLibrary {
 	
 	public GameLibrary(String packageName, String name, String version, Rule[] rules, ExtractRule extractRule, Natives natives) {
 		this(packageName + ":" + name + ":" + version, rules, extractRule, natives);
+		nameData = new String[] {packageName, name, version};
 	}
 	
 	public GameLibrary(String name, Rule[] rules, ExtractRule extractRule, Natives natives) {
+		this(name, null, rules, extractRule, natives);
+	}
+	
+	public GameLibrary(String name, URL libraryURL, Rule[] rules, ExtractRule extractRule, Natives natives) {
 		this.name = name;
+		url = libraryURL;
 		this.rules = rules;
 		extract = extractRule;
 		
@@ -103,9 +114,44 @@ public class GameLibrary {
 		return true;
 	}
 	
+	public URL getLibrariesDownloadBaseURL() {
+		return url == null ? MINECRAFT_LIBRARIES_DOWNLOAD_BASEURL : url;
+	}
+	
+	public URL getLibraryDownloadURL() throws MalformedURLException {
+		StringBuilder sb = new StringBuilder();
+		sb.append(MINECRAFT_LIBRARIES_DOWNLOAD_BASEURL.toString());
+		sb.append('/');
+		sb.append(getPackage());
+		sb.append('/');
+		sb.append(getName());
+		sb.append('/');
+		sb.append(getVersion());
+		sb.append('/');
+		sb.append(getName());
+		sb.append('-');
+		sb.append(getVersion());
+		sb.append(".jar");
+		return new URL(sb.toString());
+	}
+	
+	public URL getLibraryHashURL() throws MalformedURLException {
+		return new URL(getLibraryDownloadURL().toString() + ".sha1");
+	}
+	
 	public String toString() {
-		return "GameLibrary[name=\"" + name + "\", rules=" + (rules == null ? "null" : Arrays.asList(rules).toString()) + ", extractRule=" + (extract == null ? "null" : extract) +
+		return "GameLibrary[name=\"" + name + "\", url=\"" + url == null ? "null" : url.toString() + "\",rules=" + (rules == null ? "null" : Arrays.asList(rules).toString()) + ", extractRule=" + (extract == null ? "null" : extract) +
 				", natives=" + (isNative() ? "null" : natives) + "]";
+	}
+	
+	static {
+		URL mcLibsDlBase = null;
+		try {
+			mcLibsDlBase = new URL("https://libraries.minecraft.net");
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		MINECRAFT_LIBRARIES_DOWNLOAD_BASEURL = mcLibsDlBase;
 	}
 }
 

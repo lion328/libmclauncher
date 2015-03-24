@@ -22,18 +22,45 @@
 
 package com.lion328.libmclauncher.gamelaunch.json;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.lion328.libmclauncher.utils.FileUtil;
+
 public class GameVersion {
 	
-	private String id, minecraftArguments, mainClass, assets;
+	public static final Gson GSON_PARSER;
+	private String inheritsFrom, id, minecraftArguments, mainClass, assets;
 	private Date time, releaseTime;
 	private ReleaseType type;
 	private GameLibrary[] libraries;
 	private int minimumLauncherVersion;
+	private volatile GameVersion parent;
 	
-	public GameVersion(String id, String mcargs, String mainclass, String assets, Date time, Date rtime, ReleaseType type, GameLibrary[] libs, int minver) {
+	public GameVersion(GameVersion o) {
+		inheritsFrom = o.inheritsFrom;
+		id = o.id;
+		minecraftArguments = o.minecraftArguments;
+		mainClass = o.mainClass;
+		assets = o.assets;
+		time = o.time;
+		releaseTime = o.releaseTime;
+		type = o.type;
+		libraries = o.libraries.clone();
+		minimumLauncherVersion = o.minimumLauncherVersion;
+	}
+	
+	public GameVersion(File versionsFolder, String currentVersion) throws IOException {
+		this(GSON_PARSER.fromJson(FileUtil.readFile(new File(versionsFolder, currentVersion + File.separator + currentVersion + ".json")), GameVersion.class));
+		if(inheritsFrom != null) parent = new GameVersion(versionsFolder, inheritsFrom);
+	}
+	
+	public GameVersion(String parentVersion, String id, String mcargs, String mainclass, String assets, Date time, Date rtime, ReleaseType type, GameLibrary[] libs, int minver) {
+		inheritsFrom = parentVersion;
 		this.id = id;
 		minecraftArguments = mcargs;
 		mainClass = mainclass;
@@ -45,6 +72,10 @@ public class GameVersion {
 		minimumLauncherVersion = minver;
 	}
 
+	public String getParentVersion() {
+		return inheritsFrom;
+	}
+	
 	public String getID() {
 		return id;
 	}
@@ -76,15 +107,36 @@ public class GameVersion {
 	public GameLibrary[] getLibraries() {
 		return libraries;
 	}
+	
+	public GameLibrary[] getAllLibraries() {
+		if(parent != null) {
+			GameLibrary[] parents = parent.getAllLibraries();
+			GameLibrary[] tmp = new GameLibrary[libraries.length + parents.length];
+			System.arraycopy(parents, 0, tmp, 0, parents.length);
+			System.arraycopy(libraries, 0, tmp, parents.length, libraries.length);
+			return tmp;
+		}
+		return libraries;
+	}
 
 	public int getMinimumLauncherVersion() {
 		return minimumLauncherVersion;
 	}
 	
+	public GameVersion getParentGameVersion() {
+		return parent;
+	}
+	
 	public String toString() {
-		return "GameVersion[id=\"" + id + "\", minecraftArguments=\"" + minecraftArguments + "\", mainClass=\"" + mainClass + 
+		return "GameVersion[inheritsFrom=\"" + inheritsFrom + "\", id=\"" + id + "\", minecraftArguments=\"" + minecraftArguments + "\", mainClass=\"" + mainClass + 
 				"\", assets=" + assets.toString() + ", time=" + time.toString() + ", releaseTime=" + releaseTime.toString() +
 				", type=\"" + type.toString() + "\", libraries=" + Arrays.asList(libraries).toString() + ", minimumLauncherVersion=" + minimumLauncherVersion +
 				"]";
+	}
+	
+	static {
+		GsonBuilder gb = new GsonBuilder();
+		gb.registerTypeAdapter(Date.class, new DateType());
+		GSON_PARSER = gb.create();
 	}
 }

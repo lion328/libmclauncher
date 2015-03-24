@@ -44,7 +44,7 @@ public class MinecraftUtil {
 		return true;
 	}
 	
-	public static File getMinecraftWorkingDirectory() {
+	public static File getDefaultMinecraftWorkingDirectory() {
 		if(OSUtil.getCurrentOS().equals(OSUtil.OS.UNKNOWN)) return new File(Util.getAppdata(), "minecraft");
 		return new File(Util.getAppdata(), ".minecraft");
 	}

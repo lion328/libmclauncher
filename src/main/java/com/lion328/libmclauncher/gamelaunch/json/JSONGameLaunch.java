@@ -25,11 +25,8 @@ package com.lion328.libmclauncher.gamelaunch.json;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.lion328.libmclauncher.gamelaunch.IGameLaunch;
 import com.lion328.libmclauncher.utils.FileUtil;
 import com.lion328.libmclauncher.utils.MinecraftUtil;
@@ -37,7 +34,7 @@ import com.lion328.libmclauncher.utils.Util;
 
 public class JSONGameLaunch implements IGameLaunch {
 
-	private File basepath, versionDir, jsonFile;
+	private File basepath, versionsDir, versionDir, jsonFile;
 	private String version, ram;
 	private GameVersion gameVersion;
 	private HashMap<String, String> customParameters = new HashMap<String, String>();
@@ -47,13 +44,11 @@ public class JSONGameLaunch implements IGameLaunch {
 		this.basepath = basepath;
 		this.version = version;
 		this.ram = ram;
-		versionDir = new File(basepath, "versions" + File.separator + version);
+		versionsDir = new File(basepath, "versions");
+		versionDir = new File(versionsDir, version);
 		jsonFile = new File(versionDir, version + ".json");
 		if(!versionDir.isDirectory() || !jsonFile.isFile() || !new File(versionDir, version + ".jar").isFile()) throw new Exception("Invaild Minecraft's working directory.");
-		GsonBuilder gb = new GsonBuilder();
-		gb.registerTypeAdapter(Date.class, new DateType());
-		Gson gson = gb.create();
-		gameVersion = gson.fromJson(FileUtil.readFile(jsonFile), GameVersion.class);
+		gameVersion = new GameVersion(versionsDir, version);
 		setArgument("version_name", version);
 		setArgument("game_directory", basepath.getAbsolutePath());
 		setArgument("user_properties", "{}");
@@ -76,7 +71,8 @@ public class JSONGameLaunch implements IGameLaunch {
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append(new File(versionDir, version + ".jar").getAbsolutePath());
-		for(GameLibrary library : gameVersion.getLibraries()) {
+		
+		for(GameLibrary library : gameVersion.getAllLibraries()) {
 			if(!library.isAllowed()) continue;
 			if(library.isNative()) library.extractNatives(basepath, nativesDir);
 			else {

@@ -45,7 +45,7 @@ public class MinecraftUtil {
 	}
 	
 	public static File getDefaultMinecraftWorkingDirectory() {
-		if(OSUtil.getCurrentOS().equals(OSUtil.OS.UNKNOWN)) return new File(Util.getAppdata(), "minecraft");
-		return new File(Util.getAppdata(), ".minecraft");
+		if(OSUtil.getCurrentOS() == OSUtil.OS.UNKNOWN) return new File(Util.getAppdata(), "minecraft");
+		return new File(Util.getAppdata(), (OSUtil.getCurrentOS() == OSUtil.OS.MAC ? "" : '.') + "minecraft");
 	}
 }

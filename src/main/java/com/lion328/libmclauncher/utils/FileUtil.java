@@ -50,11 +50,13 @@ public class FileUtil {
 	}
 	
 	public static File[] listAllFiles(File dir, boolean withDirectory){
-		if(!dir.exists()) return null;
+		if(!dir.exists()) return new File[0];
 		Set<File> fs = new HashSet<File>(Arrays.asList(dir.listFiles()));
 		for(File f : fs.toArray(new File[fs.size()])){
-			if(f.isDirectory()) fs.addAll(Arrays.asList(listAllFiles(f, withDirectory)));
-			if(withDirectory) fs.add(f);
+			if(f.isDirectory()) {
+				fs.addAll(Arrays.asList(listAllFiles(f, withDirectory)));
+				if(!withDirectory) fs.remove(f);
+			} else fs.add(f);
 		}
 		return fs.toArray(new File[fs.size()]);
 	}

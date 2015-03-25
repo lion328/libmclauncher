@@ -40,26 +40,27 @@ public class JSONGameLaunch implements IGameLaunch {
 	private HashMap<String, String> customParameters = new HashMap<String, String>();
 	
 	public JSONGameLaunch(File basepath, String version, String ram) throws Exception {
-		if(!MinecraftUtil.isVaildMinecraftDirectory(basepath)) throw new Exception("Invaild Minecraft's working directory.");
 		this.basepath = basepath;
 		this.version = version;
 		this.ram = ram;
 		versionsDir = new File(basepath, "versions");
 		versionDir = new File(versionsDir, version);
 		jsonFile = new File(versionDir, version + ".json");
-		if(!versionDir.isDirectory() || !jsonFile.isFile() || !new File(versionDir, version + ".jar").isFile()) throw new Exception("Invaild Minecraft's working directory.");
-		gameVersion = new GameVersion(versionsDir, version);
-		setArgument("version_name", version);
-		setArgument("game_directory", basepath.getAbsolutePath());
-		setArgument("user_properties", "{}");
-		setArgument("user_type", gameVersion.getMainClass().equals("net.minecraft.launchwrapper.Launch") ? "legacy" : "mojang");
-		setArgument("assets_root", basepath.getAbsolutePath() + File.separator + "assets" + File.separator + (gameVersion.getMainClass().equals("net.minecraft.launchwrapper.Launch") ? "virtual" + File.separator + "legacy" : ""));
-		setArgument("game_assets", getArgument("assets_root"));
-		if(gameVersion.getAssets() != null) setArgument("assets_index_name", gameVersion.getAssets());
 	}
 	
 	@Override
 	public void launch() throws Exception {
+		if(!MinecraftUtil.isVaildMinecraftDirectory(basepath)) throw new Exception("Invaild Minecraft's working directory.");
+		if(!versionDir.isDirectory() || !jsonFile.isFile() || !new File(versionDir, version + ".jar").isFile()) throw new Exception("Invaild Minecraft's working directory.");
+		gameVersion = new GameVersion(versionsDir, version);
+		setArgumentIfNotExists("version_name", version);
+		setArgumentIfNotExists("game_directory", basepath.getAbsolutePath());
+		setArgumentIfNotExists("user_properties", "{}");
+		setArgumentIfNotExists("user_type", gameVersion.getMainClass().equals("net.minecraft.launchwrapper.Launch") ? "legacy" : "mojang");
+		setArgumentIfNotExists("assets_root", basepath.getAbsolutePath() + File.separator + "assets" + File.separator + (gameVersion.getMainClass().equals("net.minecraft.launchwrapper.Launch") ? "virtual" + File.separator + "legacy" : ""));
+		setArgumentIfNotExists("game_assets", getArgument("assets_root"));
+		if(gameVersion.getAssets() != null) setArgument("assets_index_name", gameVersion.getAssets());
+		
 		cleanOldNatives();
 		File nativesDir = new File(versionDir, version + "-natives-" + System.nanoTime());
 		
@@ -109,6 +110,10 @@ public class JSONGameLaunch implements IGameLaunch {
 	
 	public String getArgument(String key) {
 		return customParameters.containsKey("${" + key + "}") ? customParameters.get("${" + key + "}") : null;
+	}
+	
+	private void setArgumentIfNotExists(String key, String value) {
+		if(getArgument(key) == null) setArgument(key, value);
 	}
 	
 	@Override

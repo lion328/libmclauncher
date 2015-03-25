@@ -32,17 +32,19 @@ import com.lion328.libmclauncher.utils.Util;
 
 public class OldCommandGameLaunch implements IGameLaunch {
 
-	private File bin;
+	private File basepath, bin;
 	private String username, sessionID, ram;
 
 	public OldCommandGameLaunch(File basepath, String ram) throws Exception {
-		if(!MinecraftUtil.isVaildOldMinecraftDirectory(basepath)) throw new Exception("Invaild Minecraft's working directory.");
+		this.basepath = basepath;
 		this.bin = new File(basepath, "bin");
 		this.ram = ram;
 	}
 	
 	@Override
 	public void launch() throws Exception {
+		if(!MinecraftUtil.isVaildOldMinecraftDirectory(basepath)) throw new Exception("Invaild Minecraft's working directory.");
+		
 		List<String> params = new ArrayList<String>();
 		params.add(Util.getJavaRuntimePath());
 		params.add("-cp");

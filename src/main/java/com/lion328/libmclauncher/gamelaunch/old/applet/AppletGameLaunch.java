@@ -40,17 +40,18 @@ import com.lion328.libmclauncher.utils.MinecraftUtil;
 
 public class AppletGameLaunch implements IGameLaunch {
 
-	private File bin;
+	private File bin, basepath;
 	private HashMap<String, String> params = new HashMap<String, String>();
 	
-	public AppletGameLaunch(File basepath) throws Exception {
-		if(!MinecraftUtil.isVaildOldMinecraftDirectory(basepath)) throw new Exception("Invaild Minecraft's working directory.");
+	public AppletGameLaunch(File basepath) {
+		this.basepath = basepath;
 		bin = new File(basepath, "bin");
 		setStandAlone(true);
 	}
 	
 	@Override
 	public void launch() throws Exception {
+		if(!MinecraftUtil.isVaildOldMinecraftDirectory(basepath)) throw new Exception("Invaild Minecraft's working directory.");
 		if(Runtime.getRuntime().totalMemory() / 1024 / 1024 < 512) throw new Exception("Memory not enough!");
 		URL[] jars = new URL[MinecraftUtil.OLD_MINECRAFT_JARS.length];
 		for(int i = 0; i < jars.length; i++) jars[i] = new File(bin, MinecraftUtil.OLD_MINECRAFT_JARS[i]).toURI().toURL();
